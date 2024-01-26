@@ -1,0 +1,209 @@
+CONSULTAS Y TABLAS VIEW
+
+NULOS
+
+SELECT
+COUNTIF(product_id IS NULL) AS null_product_id,
+  COUNTIF(product_name IS NULL) AS null_product_name,
+  COUNTIF(category IS NULL) AS null_category,
+  COUNTIF(discounted_price IS NULL) AS null_discounted_price,
+  COUNTIF(actual_price IS NULL) AS null_actual_price,
+  COUNTIF(discount_percentage IS NULL) AS null_discount_percentage,
+  COUNTIF(about_product IS NULL) AS null_about_product
+FROM `datalab-410221.datos.amazon_product`;
+
+DUPLICADOS
+
+SELECT 
+COUNT(*)-COUNT(DISTINCT user_id) AS duplicado_user_id,
+COUNT(*)-COUNT(DISTINCT user_name) AS duplicado_user_name,
+COUNT(*)-COUNT(DISTINCT review_id) AS duplicado_review_id,
+COUNT(*)-COUNT(DISTINCT review_title) AS duplicado_review_title,
+COUNT(*)-COUNT(DISTINCT review_content) AS duplicado_review_content,
+COUNT(*)-COUNT(DISTINCT img_link) AS duplicado_img_link,
+COUNT(*)-COUNT(DISTINCT product_link) AS duplicado_product_link,
+COUNT(*)-COUNT(DISTINCT product_id) AS duplicado_product_id,
+COUNT(*)-COUNT(DISTINCT rating) AS duplicado_rating,
+COUNT(*)-COUNT(DISTINCT rating_count) AS duplicado_rating_count,
+FROM `datalab-410221.datos.amazon_review_limpia`
+
+LIMPIEZA DE DATOS
+
+SELECT
+about_product,
+regexp_replace(about_product,r'[^a-zA-Z0-9]',' ') AS about_product_limpio
+ FROM 
+ `datalab-410221.datos.amazon`
+
+CREACION DE NUEVAS VARIABLES
+
+SELECT
+  product_id,
+  AVG(SAFE_CAST(discount_percentage AS FLOAT64)) AS discount_ratio,
+  AVG(SAFE_CAST(rating AS FLOAT64)) AS average_rating,
+  AVG(SAFE_CAST(discount_percentage AS FLOAT64) * SAFE_CAST(rating AS FLOAT64)) AS discount_rating_relation
+FROM
+  `datalab-410221.datos.amazon_limpia`
+GROUP BY
+  product_id;
+
+TABLA VIEW LIMPIA
+
+SELECT
+  user_id,
+  user_name,
+  review_id,
+  review_title,
+  review_content,
+  img_link,
+  product_link,
+  product_id,
+  rating,
+  rating_count
+FROM (
+  SELECT
+    user_id,
+    user_name,
+    review_id,
+    review_title,
+    review_content,
+    img_link,
+    product_link,
+    product_id,
+    rating,
+    rating_count,
+    ROW_NUMBER() OVER (PARTITION BY review_id ORDER BY user_id) AS row_num
+  FROM
+    `datalab-410221.datos.amazon_review` ) AS TEMP
+WHERE
+  row_num = 1
+
+
+CUARTILES
+
+WITH Cuartiles AS (
+  SELECT
+    product_id,
+    NTILE(4) OVER (ORDER BY actual_price) AS cuartil_actual_price,
+    NTILE(4) OVER (ORDER BY discounted_price) AS cuartil_discounted_price,
+    NTILE(4) OVER (ORDER BY discount_percentage) AS cuartil_discount_percentage,
+    NTILE(4) OVER (ORDER BY rating) AS cuartil_rating,
+    NTILE(4) OVER (ORDER BY rating_count) AS cuartil_rating_count,
+    NTILE(4) OVER (ORDER BY sentiment_score) AS cuartil_sentiment_score
+    FROM
+    `datalab-410221.datos.datos_amazon`
+    )
+SELECT
+*
+FROM
+Cuartiles
+
+
+CORRELACIONES
+
+SELECT
+CORR (discounted_price, rating_count ) AS corr_discounted_rating,
+CORR (actual_price,discount_percentage) AS corr_price_discount,
+CORR (sentiment_score,rating) AS corr_sentiment_rating,
+CORR(actual_price,sentiment_score) AS corr_price_sentiment
+ FROM `datalab-410221.datos.amazon_sale`
+
+SEGMENTACION
+
+WITH cuartiles_categoria AS (
+  SELECT
+    product_id,
+    CAST(
+      CASE
+        WHEN cuartil_actual_price <= 1 THEN "Muy bajo"
+        WHEN cuartil_actual_price <= 2 THEN "Bajo"
+        WHEN cuartil_actual_price <= 3 THEN "Alto"
+        ELSE "Muy alto"
+      END
+      AS STRING
+    ) AS cat_actual_price,
+    CAST(
+      CASE
+        WHEN cuartil_discounted_price <= 1 THEN "Sin descuento"
+        WHEN cuartil_discounted_price <= 2 THEN "Bajo descuento"
+        WHEN cuartil_discounted_price <= 3 THEN "Descuento moderado"
+        ELSE "Gran descuento"
+      END
+      AS STRING
+    ) AS cat_discounted_price,
+    CAST(
+      CASE
+        WHEN cuartil_discount_percentage <= 1 THEN "Sin descuento"
+        WHEN cuartil_discount_percentage <= 2 THEN "Bajo descuento"
+        WHEN cuartil_discount_percentage <= 3 THEN "Descuento moderado"
+        ELSE "Gran descuento"
+      END
+      AS STRING
+    ) AS cat_discount_percentage,
+    CAST(
+      CASE
+        WHEN cuartil_rating <= 1 THEN "Insatisfactorio"
+        WHEN cuartil_rating <= 2 THEN "Aceptable"
+        WHEN cuartil_rating <= 3 THEN "Bueno"
+        ELSE "Excelente"
+      END
+      AS STRING
+    ) AS cat_rating,
+    CAST(
+      CASE
+        WHEN cuartil_rating_count <= 1 THEN "Bajo"
+        WHEN cuartil_rating_count <= 2 THEN "Moderado"
+        WHEN cuartil_rating_count <= 3 THEN "Alto"
+        ELSE "Muy alto"
+      END
+      AS STRING
+    ) AS cat_rating_count,
+    CAST(
+      CASE
+        WHEN cuartil_sentiment_score <= 1 THEN "Muy negativo"
+        WHEN cuartil_sentiment_score <= 2 THEN "Negativo"
+        WHEN cuartil_sentiment_score <= 3 THEN "Neutral"
+        ELSE "Positivo"
+      END
+      AS STRING
+    ) AS cat_sentiment_score,
+  FROM `datalab-410221.datos.cuartiles`
+)
+SELECT * FROM cuartiles_categoria;
+
+
+TABLA GENERAL
+
+SELECT
+a.product_id,
+a.product_name,
+a.category,
+a.subcategory,
+a.actual_price,
+a.cuartil_actual_price,
+s.cat_actual_price,
+a.discounted_price,
+a.cuartil_discounted_price,
+s.cat_discounted_price,
+a.discount_percentage,
+a.cuartil_discount_percentage,
+s.cat_discount_percentage,
+a.review_id,
+a.review_title_limpio,
+a.review_content_limpio,
+a.about_product_limpio,
+a.rating,
+a.cuartil_rating,
+s.cat_rating,
+a.rating_count,
+a.cuartil_rating_count,
+s.cat_rating_count,
+a.sentiment_score,
+a.cuartil_sentiment_score,
+s.cat_sentiment_score,
+FROM
+`datalab-410221.datos.amazon_sale` a
+JOIN
+`datalab-410221.datos.segmentacion` s
+ON
+a.product_id=s.product_id;
