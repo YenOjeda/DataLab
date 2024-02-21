@@ -8,7 +8,7 @@ Este conjunto de datos tiene los datos de más de 1.000 calificaciones y reseña
 
 Amazon es una empresa de tecnología estadounidense con operación multinacional, cuyos intereses comerciales incluyen el comercio electrónico, para el que compran y almacenan el inventario, y se encargan de todo el proceso, desde fijar los precios hasta el envío, el servicio al cliente y las devoluciones.
 
-El proyecto se centrará en analizar la relación entre los descuentos, las calificaciones y las ventas de productos en Amazon. Se incluirán visualizaciones y estadísticas para respaldar los hallazgos y la validacion de las siguientes hipotesis.
+Este proyecto se centraró en analizar la relación entre los descuentos, las calificaciones y las ventas de productos en Amazon. Incluí visualizaciones y estadísticas para respaldar los hallazgos y la validacion de las siguientes hipotesis.
 
 ¿Los productos con mayores descuentos tienen una puntuación de revisión más alta? 
 ¿Los productos con un sentimiento más positivo tienden a tener mejores puntuaciones? 
