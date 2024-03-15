@@ -24,7 +24,7 @@ Validar hipotesis a través de un score de sentimiento obtenido por la técnica 
 - Prueba de significancia: Test de Shapiro para validar hipótesis.
 - Comprobación a través de Test de Pearson o Correlación de Pearson.
 
-# Indides
+# Insides
 
 - Los productos con un MAYOR DESCUENTO, tienen un MEJOR RATING.
 - Los productos con un SCORE POSITIVO, tienen un MAYOR RATING.
