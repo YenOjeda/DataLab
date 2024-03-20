@@ -20,7 +20,7 @@ Validar hipotesis a través de un score de sentimiento obtenido por la técnica 
 
 - ETL: nulos, duplicados, datos fuera de alcance, cambio de tipo de dato,subcategorización de productos (BigQuery, SQL).
 - Score de sentimiento: positivo, neutro, negativo. (Python)
-- Anpalisis de cohorte (segmentación(precio, descuento, rating, score)). (Python).
+- Análisis de cohorte (segmentación(precio, descuento, rating, score)). (Python).
 - Prueba de significancia: Test de Shapiro para validar hipótesis.
 - Comprobación a través de Test de Pearson o Correlación de Pearson.
 
