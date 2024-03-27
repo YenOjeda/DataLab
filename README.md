@@ -34,7 +34,7 @@ Validar hipotesis a través de un score de sentimiento obtenido por la técnica 
 - El promedio de rating = 4/5.
 - El producto más vendido es: Cable HDMI
 
-# HERRAMIENTAS UTILIZADAS
+# Herramientas y Lenguajes
 
     •  Big Query (SQL).
     •  Google Colab (Python).
