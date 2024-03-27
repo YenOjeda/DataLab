@@ -16,7 +16,7 @@ Validar hipotesis a través de un score de sentimiento obtenido por la técnica 
 - Productos con un score positivo, tiende a tener una mayor puntuación.
 - El precio del producto afecta el score positivo.
 
-# Proceso
+# Proceso del análisis
 
 - ETL: nulos, duplicados, datos fuera de alcance, cambio de tipo de dato,subcategorización de productos (BigQuery, SQL).
 - Score de sentimiento: positivo, neutro, negativo. (Python)
